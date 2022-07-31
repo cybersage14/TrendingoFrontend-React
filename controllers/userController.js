@@ -12,13 +12,13 @@ exports.addUser = async (req, res) => {
   if (existedUser) {
     if (!existedUser.influenced_by) {
       if (influenceToken) {
-        return res.status(200).send({
+        return res.status(200).json({
           userId: existedUser.id,
           message: MESSAGE_INVALID_INFLUENCE_TOKEN
         });
       }
     }
-    return res.status(200).send({
+    return res.status(200).json({
       userId: existedUser.id,
       message: MESSAGE_ALREADY_EXISTED_USER
     });
@@ -50,12 +50,11 @@ exports.addUser = async (req, res) => {
           `));
         }
       }
-      return res.status(201).send(newUser.insertId);
     });
   } else {
     newUser = (await db.query(`
       INSERT INTO users (wallet_address) VALUES('${walletAddress}')
     `));
   }
-  return res.status(201).send(newUser.insertId);
+  return res.status(201).json({ userId: newUser.insertId });
 };
