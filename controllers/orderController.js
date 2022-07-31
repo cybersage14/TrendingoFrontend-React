@@ -11,6 +11,8 @@ exports.addNewOrder = async (req, res) => {
     realPrice
   } = req.body;
 
+  console.log('# req.body => ', req.body);
+
   try {
     let newOrder = (await db.query(`
       INSERT INTO orders (
@@ -36,8 +38,12 @@ exports.addNewOrder = async (req, res) => {
         ${newOrder.insertId}, 
         '${orderItems[i].service_type}', 
         '${orderItems[i].service_title}', 
-        ${price}
+        ${orderItems[i].price}
       `;
+
+      delete orderItems[i].service_type;
+      delete orderItems[i].service_title;
+      delete orderItems[i].price;
 
       for (let key in orderItems[i]) {
         queryOfFields += `, ${key}`;
