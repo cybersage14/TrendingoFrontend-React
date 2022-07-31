@@ -7,7 +7,8 @@ const app = express();
 app.use(express.json());
 
 // Define Routes
-app.use('/api/tempRoute', require('./routes/tempRoute'));
+app.use('/api/service', require('./routes/serviceRoutes'));
+app.use('/api/user', require('./routes/userRoutes'));
 
 if (process.env.NODE_ENV === 'production') {
   // Set static folder
