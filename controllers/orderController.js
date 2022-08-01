@@ -1,5 +1,6 @@
 const db = require("../utils/db");
 
+/** Add a new order */
 exports.addNewOrder = async (req, res) => {
   const {
     userId,
@@ -11,9 +12,8 @@ exports.addNewOrder = async (req, res) => {
     realPrice
   } = req.body;
 
-  console.log('# req.body => ', req.body);
-
   try {
+    //  Save order
     let newOrder = (await db.query(`
       INSERT INTO orders (
         id_user, 
@@ -31,7 +31,9 @@ exports.addNewOrder = async (req, res) => {
         ${realPrice}
       )
     `));
+    
 
+    //  Save the services of order
     for (let i = 0; i < orderItems.length; i += 1) {
       let queryOfFields = `(id_order, service_type, service_title, price`;
       let queryOfValues = `(
