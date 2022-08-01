@@ -31,10 +31,10 @@ exports.addUser = async (req, res) => {
           INSERT INTO users (wallet_address) VALUES('${walletAddress}')
         `));
       } else {
-        console.log('# decoded.walletAddress => ', decoded.walletAddress);
+        console.log('# decoded => ', decoded);
 
         const influencer = (await db.query(`
-          SELECT * FROM users WHERE wallet_address = '${decoded.walletAddress}';
+          SELECT * FROM users WHERE wallet_address = '${decoded.id}';
         `))[0];
 
         console.log('# influencer => ', influencer);
@@ -42,7 +42,7 @@ exports.addUser = async (req, res) => {
         if (influencer) {
           newUser = (await db.query(`
             INSERT INTO users (wallet_address, influenced_by) 
-            VALUES('${walletAddress}', '${influencer.id}')
+            VALUES('${walletAddress}', '${decoded.id}')
           `));
         } else {
           newUser = (await db.query(`
