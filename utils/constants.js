@@ -6,4 +6,6 @@ exports.MESSAGE_EMAIL_SENT_FAILED = 'Submission of your email has been failed.';
 
 exports.SITE_BASIC_URL = 'http://localhost:3000';
 
+// exports.ADMIN_EMAIL = 'support@trendingo.cc';
 exports.ADMIN_EMAIL = 'mr.new0509@gmail.com';
+exports.SENDER_EMAIL = 'trendingo.cc@gmail.com';

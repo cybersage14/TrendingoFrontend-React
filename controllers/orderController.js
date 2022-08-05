@@ -1,4 +1,4 @@
-const { ADMIN_EMAIL } = require("../utils/constants");
+const { ADMIN_EMAIL, SENDER_EMAIL } = require("../utils/constants");
 const db = require("../utils/db");
 const Sib = require("../utils/Sib");
 
@@ -13,6 +13,18 @@ exports.addNewOrder = async (req, res) => {
     discountPercentage,
     realPrice
   } = req.body;
+
+  let message = `
+    <p><b>Orderer Info</b></p>
+    <hr>
+    <p>telegram username: ${telegramUsername}</p>
+    <p>alternative telegram username: ${alternativeUsername}</p>
+    <p>price: $${realPrice}</p>
+    <p style="margin-top: 10px"><b>Orders</b></p>
+    <hr>
+  `;
+
+  const tranEmailApi = new Sib.TransactionalEmailsApi();
 
   try {
     //  Save order
@@ -34,15 +46,15 @@ exports.addNewOrder = async (req, res) => {
       )
     `));
 
-
     //  Save the services of order
     for (let i = 0; i < orderItems.length; i += 1) {
       let queryOfFields = `(id_order, service_type, service_title, price`;
-      let queryOfValues = `(
-        ${newOrder.insertId}, 
-        '${orderItems[i].service_type}', 
-        '${orderItems[i].service_title}', 
-        ${orderItems[i].price}
+      let queryOfValues = `(${newOrder.insertId}, '${orderItems[i].service_type}', '${orderItems[i].service_title}', ${orderItems[i].price}`;
+
+      message += `
+        <p style="margin-top: 5px;"><b>${i + 1}.</b></p>
+        <p>type: ${orderItems[i].service_type}</p>
+        <p>title: ${orderItems[i].service_title}</p>
       `;
 
       delete orderItems[i].service_type;
@@ -51,7 +63,9 @@ exports.addNewOrder = async (req, res) => {
 
       for (let key in orderItems[i]) {
         queryOfFields += `, ${key}`;
+        console.log(orderItems[i][key]);
         queryOfValues += `, '${orderItems[i][key]}'`;
+        message += `<p>${key}: ${orderItems[i][key]}</p>`;
       }
 
       queryOfFields += ')';
@@ -59,7 +73,27 @@ exports.addNewOrder = async (req, res) => {
 
       await db.query(`INSERT INTO order_items ${queryOfFields} VALUES ${queryOfValues};`);
     }
-    return res.status(201).send('');
+    let sender = { email: SENDER_EMAIL };
+    let receivers = [{ email: ADMIN_EMAIL }];
+
+    let mailOptions = {
+      sender,
+      to: receivers,
+      subject: 'New Order',
+      htmlContent: message
+    };
+
+    //  Send receiver an email.
+    tranEmailApi.sendTransacEmail(mailOptions)
+      .then((result) => {
+        console.log('# result => ', result);
+        return res.status(201).send('');
+      })
+      .catch(error => {
+        console.log('# error => ', error);
+        return res.status(500).send('');
+      });
+
   } catch (error) {
     console.log('# error => ', error);
     return res.status(500).send('');
