@@ -5,3 +5,5 @@ exports.MESSAGE_EMAIL_SENT_SUCCESS = 'Your email has been sent your friend.';
 exports.MESSAGE_EMAIL_SENT_FAILED = 'Submission of your email has been failed.';
 
 exports.SITE_BASIC_URL = 'http://localhost:3000';
+
+exports.ADMIN_EMAIL = 'mr.new0509@gmail.com';

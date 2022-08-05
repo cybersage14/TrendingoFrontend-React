@@ -1,4 +1,6 @@
+const { ADMIN_EMAIL } = require("../utils/constants");
 const db = require("../utils/db");
+const Sib = require("../utils/Sib");
 
 /** Add a new order */
 exports.addNewOrder = async (req, res) => {
@@ -31,7 +33,7 @@ exports.addNewOrder = async (req, res) => {
         ${realPrice}
       )
     `));
-    
+
 
     //  Save the services of order
     for (let i = 0; i < orderItems.length; i += 1) {
@@ -62,4 +64,32 @@ exports.addNewOrder = async (req, res) => {
     console.log('# error => ', error);
     return res.status(500).send('');
   }
+};
+
+exports.orderDevService = (req, res) => {
+  const { dev_order_description, telegram_username, email } = req.body;
+  const tranEmailApi = new Sib.TransactionalEmailsApi();
+  let sender = { email };
+  let receivers = [{ email: ADMIN_EMAIL }];
+
+  let mailOptions = {
+    sender,
+    to: receivers,
+    subject: 'Order of Development service',
+    htmlContent: `
+      <p>${dev_order_description}</p><br>
+      ${telegram_username && (`<p>Telegram username: <b><a href="https://t.me/${telegram_username}">${telegram_username}</a></b></p>`)}
+    `
+  };
+
+  //  Send receiver an email.
+  tranEmailApi.sendTransacEmail(mailOptions)
+    .then((result) => {
+      console.log('# result => ', result);
+      return res.status(200).send('');
+    })
+    .catch(error => {
+      console.log('# error => ', error);
+      return res.status(500).send('');
+    });
 };
