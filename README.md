@@ -1,7 +1,7 @@
 # The backend of Trendingo - Ordering service related to crypto side
 
 ## Live site
-[![Live site](readme_images/guide-site.png)]
+![Live site](readme_images/guide-site.png)
 
 ## Release date
 TBD
